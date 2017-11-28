@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Experiments.Entity.Tests
 {
-    public class BookingTests
+    public class EntityEventTests
     {
         [Fact]
         public void RehydratesFlight()
