@@ -7,22 +7,25 @@ namespace Experiments.HotAggregates
 {
     public class AggregateRepository
     {
-        private readonly Dictionary<string, Aggregate> cache = new Dictionary<string, Aggregate>();
+        private readonly AggregateCache cache;
         private readonly Func<string, object[]> streamReader;
         private readonly Action<string, object[]> streamWriter;
 
-        public AggregateRepository(Func<string, object[]> streamReader, Action<string, object[]> streamWriter)
+        public AggregateRepository(Func<string, object[]> streamReader, Action<string, object[]> streamWriter, int maxInMemoryCount = 100)
         {
             this.streamReader = streamReader;
             this.streamWriter = streamWriter;
+
+            cache = new AggregateCache(maxInMemoryCount);
         }
 
         public TAggregate Load<TAggregate>(string aggregateId) where TAggregate : Aggregate
         {
             var stream = StreamName<TAggregate>(aggregateId);
-            if (cache.ContainsKey(stream))
+            var cachedAggregate = cache.GetOrDefault(stream);
+            if (cachedAggregate != null)
             {
-                return (TAggregate)cache[stream];
+                return (TAggregate)cachedAggregate;
             }
 
             var aggregate = (TAggregate)Activator.CreateInstance(typeof(TAggregate), true);
@@ -32,7 +35,7 @@ namespace Experiments.HotAggregates
                 aggregate.Apply(e);
             }
             
-            cache[stream] = aggregate;
+            cache.Add(stream, aggregate);
 
             return aggregate;
         }
