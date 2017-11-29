@@ -11,12 +11,12 @@ namespace Experiments.HotAggregates
         private readonly Func<string, object[]> streamReader;
         private readonly Action<string, object[]> streamWriter;
 
-        public AggregateRepository(Func<string, object[]> streamReader, Action<string, object[]> streamWriter, int maxInMemoryCount = 100)
+        public AggregateRepository(Func<string, object[]> streamReader, Action<string, object[]> streamWriter, 
+                                   AggregateCache cache)
         {
             this.streamReader = streamReader;
             this.streamWriter = streamWriter;
-
-            cache = new AggregateCache(maxInMemoryCount);
+            this.cache = cache;
         }
 
         public TAggregate Load<TAggregate>(string aggregateId) where TAggregate : Aggregate
