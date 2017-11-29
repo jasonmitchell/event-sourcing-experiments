@@ -75,10 +75,33 @@ namespace Experiments.HotAggregates.Tests
             readCount.Should().Be(2);
         }
 
-        [Fact(Skip = "TODO")]
-        public void ExtendsLifespanWhenAggregateIsReturned()
+        [Fact]
+        public async Task ExtendsLifespanWhenAggregateIsReturned()
         {
+            var readCount = 0;
+            var repository = new AggregateRepository(stream =>
+            {
+                readCount++;
+                return streams.Single(x => x.stream == stream).events;
+            }, defaultStreamWriter, new AggregateCache(2, TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(1)));
 
+            var a = repository.Load<TicketSale>(streams[0].ticketId);
+            a.Should().NotBeNull();
+            readCount.Should().Be(1);
+
+            // Wait a bit less than the lifespan
+            await Task.Delay(7);
+            
+            // Read 'A' again which should slide the expiration window
+            repository.Load<TicketSale>(streams[0].ticketId);
+            
+            // Wait long enough to exceed the original lifespan
+            await Task.Delay(7);
+            
+            // Read 'A' again to make sure the expiration window actually moved
+            repository.Load<TicketSale>(streams[0].ticketId);
+
+            readCount.Should().Be(1);
         }
 
         [Fact]

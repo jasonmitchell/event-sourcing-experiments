@@ -55,14 +55,17 @@ namespace Experiments.HotAggregates
                 }
             }
             
-            cache[identifier] = (aggregate, DateTime.UtcNow);
+            cache.AddOrUpdate(identifier, (aggregate, DateTime.UtcNow), (key, value) => (value.aggregate, DateTime.UtcNow));
         }
 
         public Aggregate GetOrDefault(string identifier)
         {
             if (cache.ContainsKey(identifier))
             {
-                return cache[identifier].aggregate;
+                var aggregate = cache[identifier].aggregate;
+                cache.AddOrUpdate(identifier, (aggregate, DateTime.UtcNow), (key, value) => (value.aggregate, DateTime.UtcNow));
+                
+                return aggregate;
             }
 
             return null;
