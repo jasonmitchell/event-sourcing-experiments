@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Generic;
 
 namespace Experiments.NoBaseAggregate.Bookings
 {
     public class Booking : IEventSource
     {
         private readonly EventSourcerThing _eventSourcerThing;
-
+        EventSourcerThing IEventSource.EventSourcerThing => _eventSourcerThing;
+        
         public Guid Id { get; private set; }
         public string FlightNumber { get; private set; }
         public string DepartureAirport { get; private set; }
@@ -25,9 +25,6 @@ namespace Experiments.NoBaseAggregate.Bookings
                 })
                 .Given<FlightConfirmed>(_ => FlightConfirmed = true);
         }
-
-        void IEventSource.RestoreFromEvents(IEnumerable<object> events) => _eventSourcerThing.Replay(events);
-        object[] IEventSource.TakeEvents() => _eventSourcerThing.Reset();
 
         public static Booking Open(Guid id)
         {

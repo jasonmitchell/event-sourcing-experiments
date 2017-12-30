@@ -18,7 +18,7 @@ namespace Experiments.NoBaseAggregate.Tests
             };
 
             var booking = (Booking)Activator.CreateInstance(typeof(Booking), true);
-            booking.As<IEventSource>().RestoreFromEvents(events);
+            booking.As<IEventSource>().EventSourcerThing.Replay(events);
 
             booking.Id.Should().Be(Guid.Parse("00000000-0000-0000-0000-000000000001"));
             booking.FlightNumber.Should().Be("AB123");
@@ -34,14 +34,14 @@ namespace Experiments.NoBaseAggregate.Tests
             booking.RequestFlight("AB123", "BHD", "LBA");
             booking.ConfirmFlight();
 
-            var events = booking.As<IEventSource>().TakeEvents();
+            var events = booking.As<IEventSource>().EventSourcerThing.Reset();
 
             events.Should().HaveCount(3);
             events[0].Should().BeOfType<BookingOpened>();
             events[1].Should().BeOfType<FlightRequested>();
             events[2].Should().BeOfType<FlightConfirmed>();
             
-            var remainingEvents = booking.As<IEventSource>().TakeEvents();
+            var remainingEvents = booking.As<IEventSource>().EventSourcerThing.Reset();
             remainingEvents.Should().HaveCount(0);
         }
     }
