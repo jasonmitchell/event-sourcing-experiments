@@ -21,10 +21,11 @@ namespace Experiments.NoBaseAggregate.Tests
             booking.As<IEventSource>().RestoreFromEvents(events);
 
             booking.Id.Should().Be(Guid.Parse("00000000-0000-0000-0000-000000000001"));
-            booking.FlightNumber.Should().Be("AB123");
-            booking.DepartureAirport.Should().Be("BHD");
-            booking.DestinationAirport.Should().Be("LBA");
-            booking.FlightConfirmed.Should().BeTrue();
+            booking.Flight.Should().NotBeNull();
+            booking.Flight.Number.Should().Be("AB123");
+            booking.Flight.DepartureAirport.Should().Be("BHD");
+            booking.Flight.DestinationAirport.Should().Be("LBA");
+            booking.Flight.Confirmed.Should().BeTrue();
         }
 
         [Fact]
@@ -32,7 +33,7 @@ namespace Experiments.NoBaseAggregate.Tests
         {
             var booking = Booking.Open(Guid.Parse("00000000-0000-0000-0000-000000000001"));
             booking.RequestFlight("AB123", "BHD", "LBA");
-            booking.ConfirmFlight();
+            booking.Flight.Confirm();
 
             var events = booking.As<IEventSource>().TakeEvents();
 

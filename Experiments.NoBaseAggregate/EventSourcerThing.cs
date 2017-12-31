@@ -6,36 +6,80 @@ namespace Experiments.NoBaseAggregate
     // TODO: Better name
     public class EventSourcerThing
     {
-        private readonly Dictionary<Type, Action<object>> _handlers = new Dictionary<Type, Action<object>>();
-        private readonly Queue<object> _recordedEvents = new Queue<object>();
+        private readonly EventSourcerThing parent;
+        private readonly List<EventSourcerThing> children = new List<EventSourcerThing>();
+        
+        private readonly Dictionary<Type, Action<EventSourcerThing, object>> handlers = new Dictionary<Type, Action<EventSourcerThing, object>>();
+        private readonly Queue<object> recordedEvents;
 
-        public void Then<TEvent>(TEvent e)
+        public EventSourcerThing()
         {
-            _recordedEvents.Enqueue(e);
+            recordedEvents = new Queue<object>();
         }
 
+        private EventSourcerThing(EventSourcerThing parent)
+        {
+            this.parent = parent;
+            this.parent.children.Add(this);
+            recordedEvents = this.parent.recordedEvents;
+        }
+        
+        public EventSourcerThing CreateChild()
+        {
+            var child = new EventSourcerThing(this);
+            return child;
+        }
+        
         public EventSourcerThing Given<TEvent>(Action<TEvent> handler)
         {
-            _handlers.Add(typeof(TEvent), x => handler((TEvent)x));
+            handlers.Add(typeof(TEvent), (ctx, e) => handler((TEvent)e));
             return this;
         }
         
+        public EventSourcerThing Given<TEvent>(Action<EventSourcerThing, TEvent> handler)
+        {
+            handlers.Add(typeof(TEvent), (ctx, e) => handler(ctx, (TEvent)e));
+            return this;
+        }
+
         public void Replay(IEnumerable<object> events)
         {
+            // TODO: Interfaces so Replay isn't exposed on children?
+            if (parent != null) throw new InvalidOperationException("Cannot replay a child event sourcer");
+            
             foreach (var e in events)
             {
-                var type = e.GetType();
-                if (_handlers.ContainsKey(type))
+                Apply(e);
+                
+                foreach (var child in children)
                 {
-                    _handlers[type](e);
+                    child.Apply(e);
                 }
+            }
+        }
+        
+        public void Then<TEvent>(TEvent e)
+        {
+            Apply(e);
+            recordedEvents.Enqueue(e);
+        }
+
+        private void Apply(object e)
+        {
+            var type = e.GetType();
+            if (handlers.ContainsKey(type))
+            {
+                handlers[type](this, e);
             }
         }
 
         public object[] Reset()
         {
-            var events = _recordedEvents.ToArray();
-            _recordedEvents.Clear();
+            // TODO: Interfaces so Reset isn't exposed on children?
+            if (parent != null) throw new InvalidOperationException("Cannot reset a child event sourcer");
+            
+            var events = recordedEvents.ToArray();
+            recordedEvents.Clear();
             
             return events;
         }
