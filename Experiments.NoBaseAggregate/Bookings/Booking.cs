@@ -5,14 +5,15 @@ namespace Experiments.NoBaseAggregate.Bookings
 {
     public class Booking : IEventSource
     {
-        private readonly EventSourcerThing eventSourcerThing;
+        private readonly EventSourceContext context;
+        private Action<object> Then => context.Then;
 
         public Guid Id { get; private set; }
         public Flight Flight { get; private set; }
 
         private Booking()
         {
-            eventSourcerThing = new EventSourcerThing()
+            context = new EventSourceContext()
                 .Given<BookingOpened>(e => Id = e.Id)
                 .Given<FlightRequested>((ctx, e) =>
                 {
@@ -22,13 +23,13 @@ namespace Experiments.NoBaseAggregate.Bookings
                 .Given<FlightConfirmed>(e => Flight.Given(e));
         }
 
-        void IEventSource.RestoreFromEvents(IEnumerable<object> events) => eventSourcerThing.Replay(events);
-        object[] IEventSource.TakeEvents() => eventSourcerThing.Reset();
+        void IEventSource.RestoreFromEvents(IEnumerable<object> events) => context.Replay(events);
+        object[] IEventSource.TakeEvents() => context.Reset();
 
         public static Booking Open(Guid id)
         {
             var booking = new Booking();
-            booking.eventSourcerThing.Then(new BookingOpened(id));
+            booking.Then(new BookingOpened(id));
 
             return booking;
         }
@@ -36,7 +37,7 @@ namespace Experiments.NoBaseAggregate.Bookings
         public void RequestFlight(string flightNumber, string departureAirport, string destinationAirport)
         {
             if (Flight?.Confirmed == true) throw new InvalidOperationException("Flight already confirmed");
-            eventSourcerThing.Then(new FlightRequested(flightNumber, departureAirport, destinationAirport));
+            Then(new FlightRequested(flightNumber, departureAirport, destinationAirport));
         }
     }
 }

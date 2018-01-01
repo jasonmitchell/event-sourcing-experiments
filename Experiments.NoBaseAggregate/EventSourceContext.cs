@@ -3,24 +3,23 @@ using System.Collections.Generic;
 
 namespace Experiments.NoBaseAggregate
 {
-    // TODO: Better name
-    public class EventSourcerThing
+    public class EventSourceContext
     {
-        private readonly Dictionary<Type, Action<EventSourcerThing, object>> handlers = new Dictionary<Type, Action<EventSourcerThing, object>>();
+        private readonly Dictionary<Type, Action<EventSourceContext, object>> handlers = new Dictionary<Type, Action<EventSourceContext, object>>();
         private readonly Queue<object> recordedEvents;
 
-        public EventSourcerThing()
+        public EventSourceContext()
         {
             recordedEvents = new Queue<object>();
         }
         
-        public EventSourcerThing Given<TEvent>(Action<TEvent> handler)
+        public EventSourceContext Given<TEvent>(Action<TEvent> handler)
         {
             handlers.Add(typeof(TEvent), (ctx, e) => handler((TEvent)e));
             return this;
         }
         
-        public EventSourcerThing Given<TEvent>(Action<EventSourcerThing, TEvent> handler)
+        public EventSourceContext Given<TEvent>(Action<EventSourceContext, TEvent> handler)
         {
             handlers.Add(typeof(TEvent), (ctx, e) => handler(ctx, (TEvent)e));
             return this;
