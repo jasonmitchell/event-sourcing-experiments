@@ -16,19 +16,6 @@ namespace Experiments.NoBaseAggregate
         {
             recordedEvents = new Queue<object>();
         }
-
-        private EventSourcerThing(EventSourcerThing parent)
-        {
-            this.parent = parent;
-            this.parent.children.Add(this);
-            recordedEvents = this.parent.recordedEvents;
-        }
-        
-        public EventSourcerThing CreateChild()
-        {
-            var child = new EventSourcerThing(this);
-            return child;
-        }
         
         public EventSourcerThing Given<TEvent>(Action<TEvent> handler)
         {

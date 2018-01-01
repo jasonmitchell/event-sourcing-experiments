@@ -14,7 +14,12 @@ namespace Experiments.NoBaseAggregate.Bookings
         {
             eventSourcerThing = new EventSourcerThing()
                 .Given<BookingOpened>(e => Id = e.Id)
-                .Given<FlightRequested>((ctx, e) => Flight = new Flight(ctx));
+                .Given<FlightRequested>((ctx, e) =>
+                {
+                    Flight = new Flight(ctx);
+                    Flight.Given(e);
+                })
+                .Given<FlightConfirmed>(e => Flight.Given(e));
         }
 
         void IEventSource.RestoreFromEvents(IEnumerable<object> events) => eventSourcerThing.Replay(events);

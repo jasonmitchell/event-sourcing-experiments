@@ -11,16 +11,22 @@ namespace Experiments.NoBaseAggregate.Bookings
         public string DestinationAirport {get; private set;}
         public bool Confirmed { get; private set; }
 
-        internal Flight(EventSourcerThing parentEventSourcer)
+        internal Flight(EventSourcerThing eventSourcerThing)
         {
-            eventSourcerThing = parentEventSourcer.CreateChild()
-                .Given<FlightRequested>(e =>
-                {
-                    Number = e.FlightNumber;
-                    DepartureAirport = e.DepartureAirport;
-                    DestinationAirport = e.DestinationAirport;
-                })
-                .Given<FlightConfirmed>(e => Confirmed = true);
+            // TODO: limit access to only allow recording events from an entity?
+            this.eventSourcerThing = eventSourcerThing;
+        }
+
+        public void Given(FlightRequested e) 
+        {
+            Number = e.FlightNumber;
+            DepartureAirport = e.DepartureAirport;
+            DestinationAirport = e.DestinationAirport;
+        }
+
+        public void Given(FlightConfirmed e) 
+        {
+            Confirmed = true;
         }
         
         public void Confirm()
