@@ -16,7 +16,7 @@ namespace Experiments.NoBaseAggregate.Bookings
                 .Given<BookingOpened>(e => Id = e.Id)
                 .Given<FlightRequested>((ctx, e) =>
                 {
-                    Flight = new Flight(ctx);
+                    Flight = new Flight(ctx.Then);
                     Flight.Given(e);
                 })
                 .Given<FlightConfirmed>(e => Flight.Given(e));

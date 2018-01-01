@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Experiments.NoBaseAggregate.Bookings
 {
     public class Flight
     {
-        private readonly EventSourcerThing eventSourcerThing;
+        private Action<object> Then { get; }
         
         public string Number {get; private set;}
         public string DepartureAirport {get; private set;}
         public string DestinationAirport {get; private set;}
         public bool Confirmed { get; private set; }
 
-        internal Flight(EventSourcerThing eventSourcerThing)
+        internal Flight(Action<object> then)
         {
-            // TODO: limit access to only allow recording events from an entity?
-            this.eventSourcerThing = eventSourcerThing;
+            Then = then;
         }
 
         public void Given(FlightRequested e) 
@@ -31,7 +31,7 @@ namespace Experiments.NoBaseAggregate.Bookings
         
         public void Confirm()
         {
-            eventSourcerThing.Then(new FlightConfirmed(Number, DepartureAirport, DestinationAirport));
+            Then(new FlightConfirmed(Number, DepartureAirport, DestinationAirport));
         }
     }
 }

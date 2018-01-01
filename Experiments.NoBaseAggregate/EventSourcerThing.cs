@@ -6,9 +6,6 @@ namespace Experiments.NoBaseAggregate
     // TODO: Better name
     public class EventSourcerThing
     {
-        private readonly EventSourcerThing parent;
-        private readonly List<EventSourcerThing> children = new List<EventSourcerThing>();
-        
         private readonly Dictionary<Type, Action<EventSourcerThing, object>> handlers = new Dictionary<Type, Action<EventSourcerThing, object>>();
         private readonly Queue<object> recordedEvents;
 
@@ -31,17 +28,9 @@ namespace Experiments.NoBaseAggregate
 
         public void Replay(IEnumerable<object> events)
         {
-            // TODO: Interfaces so Replay isn't exposed on children?
-            if (parent != null) throw new InvalidOperationException("Cannot replay a child event sourcer");
-            
             foreach (var e in events)
             {
                 Apply(e);
-                
-                foreach (var child in children)
-                {
-                    child.Apply(e);
-                }
             }
         }
         
@@ -62,9 +51,6 @@ namespace Experiments.NoBaseAggregate
 
         public object[] Reset()
         {
-            // TODO: Interfaces so Reset isn't exposed on children?
-            if (parent != null) throw new InvalidOperationException("Cannot reset a child event sourcer");
-            
             var events = recordedEvents.ToArray();
             recordedEvents.Clear();
             
