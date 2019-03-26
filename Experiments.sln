@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experiments.NoBaseAggregate
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experiments.ExternalAggregateState", "Experiments.ExternalAggregateState\Experiments.ExternalAggregateState.csproj", "{D5F2E941-5996-4918-B5A0-B7CF6CFB2CB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experiments.Functional", "Experiments.Functional\Experiments.Functional.csproj", "{4199057E-F999-43D7-ABA9-35C3C637EF52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,17 @@ Global
 		{D5F2E941-5996-4918-B5A0-B7CF6CFB2CB7}.Release|x64.Build.0 = Release|Any CPU
 		{D5F2E941-5996-4918-B5A0-B7CF6CFB2CB7}.Release|x86.ActiveCfg = Release|Any CPU
 		{D5F2E941-5996-4918-B5A0-B7CF6CFB2CB7}.Release|x86.Build.0 = Release|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Debug|x64.Build.0 = Debug|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Debug|x86.Build.0 = Debug|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Release|x64.ActiveCfg = Release|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Release|x64.Build.0 = Release|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Release|x86.ActiveCfg = Release|Any CPU
+		{4199057E-F999-43D7-ABA9-35C3C637EF52}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
