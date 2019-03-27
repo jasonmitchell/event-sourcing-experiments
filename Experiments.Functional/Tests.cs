@@ -14,7 +14,8 @@ namespace Experiments.Functional
         {
             var state = ReservationState.Initial;
             var command = new RequestTickets(Guid.NewGuid(), 4);
-            var events = Reservation.Handle(state, command).ToList();
+            var reservation = new Reservation(state);
+            var events = reservation.Handle(command).ToList();
 
             Assert.Single(events);
             Assert.IsType<TicketsRequested>(events.Single());
@@ -31,7 +32,8 @@ namespace Experiments.Functional
 
             var state = ReservationState.Apply(history);
             var command = new ConfirmReservation(reservationId);
-            var events = Reservation.Handle(state, command).ToList();
+            var reservation = new Reservation(state);
+            var events = reservation.Handle(command).ToList();
             
             Assert.Single(events);
             Assert.IsType<ReservationConfirmed>(events.Single());

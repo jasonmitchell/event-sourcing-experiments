@@ -7,7 +7,14 @@ namespace Experiments.Functional.Domain
 {
     public class Reservation
     {
-        public static IEnumerable<object> Handle(ReservationState _, RequestTickets command)
+        private readonly ReservationState _state;
+
+        public Reservation(ReservationState state)
+        {
+            _state = state;
+        }
+        
+        public IEnumerable<object> Handle(RequestTickets command)
         {
             var reservationId = Guid.NewGuid();
             var requestedOn = DateTime.UtcNow;
@@ -15,16 +22,16 @@ namespace Experiments.Functional.Domain
             yield return new TicketsRequested(reservationId, command.TicketId, command.QuantityRequested, requestedOn);
         }
 
-        public static IEnumerable<object> Handle(ReservationState state, ConfirmReservation _)
+        public IEnumerable<object> Handle(ConfirmReservation _)
         {
             var confirmedOn = DateTime.UtcNow;
-            yield return new ReservationConfirmed(state.Id, state.TicketId, state.QuantityReserved, confirmedOn);
+            yield return new ReservationConfirmed(_state.Id, _state.TicketId, _state.QuantityReserved, confirmedOn);
         }
 
-        public static IEnumerable<object> Handle(ReservationState state, RejectReservation _)
+        public IEnumerable<object> Handle(RejectReservation _)
         {
             var rejectedOn = DateTime.UtcNow;
-            yield return new ReservationRejected(state.Id, state.TicketId, state.QuantityRequested, rejectedOn);
+            yield return new ReservationRejected(_state.Id, _state.TicketId, _state.QuantityRequested, rejectedOn);
         }
     }
 }
